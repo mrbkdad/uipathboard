@@ -213,11 +213,12 @@ class Orchestrator {
     xhttp.open(p["type"].toUpperCase(), this.url + p["extension"], false);
     xhttp.setRequestHeader('Content-Type', 'application/json');
 
-		// token 처리 추가 - jwpark
-		if(!this.token){
-			this.token = this.getToken(this.tenant,this.user,this.pass);
-		}
-		xhttp.setRequestHeader('Authorization', 'Bearer ' + (this.token || ''));
+	// token 처리 추가 - jwpark
+	console.log("@@ Check Token : " + this.token);		
+	if(!this.token){
+		this.token = this.getToken(this.tenant,this.user,this.pass);
+	}
+	xhttp.setRequestHeader('Authorization', 'Bearer ' + (this.token || ''));
     if( p.hasOwnProperty('ou')) {
     	xhttp.setRequestHeader('X-UIPATH-OrganizationUnitId', p["ou"]);
 		}

@@ -91,3 +91,29 @@ body {
 
 .border-top { border-top: 1px solid #e5e5e5; }
 .border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+.chart rect {
+  fill: steelblue;
+}
+
+.chart text{
+  fill: darkorange;
+  font: 15px sans-serif;
+  text-anchor: end;
+}
+
+.chart g axis {
+  fill: black;
+  font: 15px sans-serif;
+  text-anchor: end;
+}
