@@ -6,17 +6,34 @@
     <meta name="description" content="UiPath Dashboard">
     <meta name="author" content="jwpark">
     <title>UiPath Board with Vue and Bootstrap</title>
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" integrity="sha256-bLNUHzSMEvxBhoysBE7EXYlIrmo7+n7F4oJra1IgOaM=" crossorigin="anonymous" />
     <link rel="stylesheet" href="/stylesheets/dashboard.css">
     <style type="text/css">/* Chart.js */
     @-webkit-keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}@keyframes chartjs-render-animation{from{opacity:0.99}to{opacity:1}}.chartjs-render-monitor{-webkit-animation:chartjs-render-animation 0.001s;animation:chartjs-render-animation 0.001s;}
     </style>
-  </head>
+  
+	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- proper.min.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
   <body>
 <!--Head Bar -->
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">UiPath Jobs Board</a>
-      <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+      <!-- date picker -->
+		<div class="form-control form-control-dark w-100" id="appDatePicker">
+  			From : <input type=date id="from_date" v-model="from_date"> ~ to : <input type=date id="to_date" v-model="to_date"> <button v-on:click="goChart">go</button>
+ 		</div>
+      <!-- date picker -->
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
           <a class="nav-link" href="#">Made By KS</a>
@@ -40,7 +57,15 @@
         </nav>
 <!--Left Menu Bar -->
  
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        	<div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+        		<div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+        			<div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div>
+        		</div>
+	        	<div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+	        		<div style="position:absolute;width:200%;height:200%;left:0; top:0"></div>
+	        	</div>
+	        </div>
 <!--Main rignt button -->
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-top">
             <h1 class="h2">Dashboard</h1>
@@ -50,8 +75,8 @@
             </div>
           </div>
 <!--Main rignt button -->
-		  <svg class="my-4 chartjs-render-monitor chart" id="appMainChart" width="916" height="385" style="display: block; height: 385px; width: 916px;">
-		  </svg>
+		  <div class="my-4 chartjs-render-monitor chart" id="chart">
+		  </div>
 <!--Main top Chart
 		  <svg id="appMainChart" class="chart" width="800" height="200"></svg>
           <canvas class="my-4 chartjs-render-monitor" id="myChart" width="916" height="385" style="display: block; height: 257px; width: 611px;"></canvas>
@@ -80,128 +105,159 @@ Main top Chart -->
       </div>
     </div>    
 
-    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <!-- proper.min.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-    <!-- Icons -->
-    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
     <script>
       feather.replace()
-    </script>
+ 		
+ 		// vue component
+ 		function newDate(d = 0){
+			var date = new Date();
+			date = new Date(date.getFullYear(),date.getMonth(),date.getDay()-d);
+			return date.toISOString().substring(0,10);
+		}
 
+		var vm_datepicker = new Vue({
+			el: '#appDatePicker',
+			data: {
+				from_date : null,
+				to_date : newDate()
+			},
+			methods: {
+				updateFrom: function(d) {
+					this.from_date = d;
+				},
+				updateTo: function(d) {
+					this.to_date = d;
+				},
+				goChart:function(){
+					console.log(this.from_date + "~" + this.to_date);
+					show_chart();
+				}
+			},
+		  	created:function(){
+		  		console.log('datepicker created!')
+		  	}
+		});
+		var vm_menu = new Vue({
+		  el: '#appLeftMenu',
+		  data : {
+		    menus:[
+		      { menu : 'Dashboard', link : '#', _class:'nav-link active',
+		        icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+		        
+		      },
+		      { menu : 'Jobs', link : '#', _class:'nav-link',
+		        icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'
+		      },{ menu : 'ROI', link : '#', _class:'nav-link',
+		      	icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg>'
+		      }
+		    ]
+		  },
+		  created:function(){
+		    console.log('left menu created!')
+		  }
+		})
+
+		var vm_data = new Vue({
+		  el: '#appMainTable',
+		  data : {
+		  	jobs: [],
+		  	heads:["jobs","start","end","state","roi","result"]
+		  },
+		  created:function(){
+		  	console.log('data created!')
+		  }
+		})
+   </script>
     <!-- Uipath API : Jobs -->
     <script>
     	var jobs_info = [];
-    	d3.json('/uipath/info/Jobs',function(data){
-    		//console.log(data);
-    		data.forEach(function(d,i){
-    			//console.log(d);
-	    		let job_data = {
-	    			jobs:d.ReleaseName, start:d.StartTime, end:d.EndTime, state:d.State,
-	    			roi:30,result:1
-	    		};
-	    		if(d.InputArguments){
-	    			job_data.roi = JSON.parse(d.InputArguments).roi;
-	    		}
-    			jobs_info.push(job_data);
-    		});
-			view_barchart(jobs_info);
-		});
-    </script>
+    	show_chart();
 
-    <script> // v3 bar chart
-    function view_barchart(raw_data){
-		var chart_data = d3.nest()
-		  .key(function(d){return d.jobs;})
-		  .rollup(function(dg){
-		    return d3.sum(dg,function(dge){return dge.roi;})
-		  })
-		  .entries(raw_data);
-		//console.log(chart_data);
-
-		var chart_id = "#appMainChart";//"#chartArea svg";
-		var width = d3.select(chart_id).attr("width"); // svg width
-		var height = d3.select(chart_id).attr("height"); // svg height
-		var margin = 10; // svg margin
-		var chart_height = parseInt(height/chart_data.length) - margin*2; //40; // barchart height
-		var chart_gap = 5; // barchart bar gap
-
-		var x_scale = d3.scaleLinear()
-						.domain([0,d3.max(chart_data,function(d){return d.value;})])
-						.range([margin*2,width-margin*2]);
-
-		var chart = d3.select(chart_id).selectAll("g")
-			.data(chart_data)
-			.enter()
-			.append("g")
-			.attr("transform", function(d,i){
-				return "translate(0,"+i*chart_height+")";
+    	function show_chart(){
+    		jobs_info = [];
+    		let api_url = "/uipath/info/Jobs";
+    		let from = vm_datepicker.from_date;
+    		let to = vm_datepicker.to_date;
+    		if(from != null && from.length >= 10){
+    			api_url = api_url + "/" + from.substring(0,10);
+    		}
+    		if(to != null && to.length >= 10){
+    			api_url = api_url + "/" + to.substring(0,10);
+    		}
+    		console.log(api_url)
+	    	d3.json(api_url,function(data){
+	    		//console.log(data);
+	    		data.forEach(function(d,i){
+	    			//console.log(d);
+		    		let job_data = {
+		    			jobs:d.ReleaseName, start:d.StartTime, end:d.EndTime, state:d.State,
+		    			roi:30,result:1
+		    		};
+		    		if(d.InputArguments){
+		    			job_data.roi = JSON.parse(d.InputArguments).roi;
+		    		}
+	    			jobs_info.push(job_data);
+	    		});
+				view_barchart("#chart",jobs_info);
 			});
-		chart.append("rect")
-			.attr("height", chart_height - chart_gap)
-			.attr("width",function(d){ return x_scale(d.value);});
+    	}
 
-		chart.append("text")
-		 	.attr("x", function(d) { return x_scale(d.value) - 10; })
-		 	.attr("y", (chart_height - chart_gap)/2)
-		 	.attr("dy", ".30em")
-			.attr('class','chart_title')
-			.text(function(d){ return d.key; });
+		// chart size
+		var margin = {top: 10, right: 40, bottom: 30, left: 30},
+		    width = 900 - margin.left - margin.right,
+		    height = 300 - margin.top - margin.bottom;
 
-		// X-axis
-		d3.select(chart_id).append('g')//('#xaxis')
-		  .attr('transform', 'translate(0,'+(height-margin*2)+')')//세로20만큼 내려서 전개
-		  .attr('class','axis')
-		  .call(d3.axisBottom(x_scale));
-	}
+	    function view_barchart(chart_id, raw_data){
+	    	vm_data.jobs = raw_data;
+	    	
+			var chart_data = d3.nest()
+			  .key(function(d){return d.jobs;})
+			  .rollup(function(dg){
+			    return d3.sum(dg,function(dge){return dge.roi;})
+			  })
+			  .entries(raw_data);
+			//console.log(chart_data);
+			d3.select(chart_id).select("svg").remove();
+			var svg = d3.select(chart_id).append("svg")
+			        .attr("class","chart")
+			        .attr("width", width + margin.left + margin.right)
+			        .attr("height", height + margin.top + margin.bottom);
+
+
+			var barmargin = 5;
+			var barheight = parseInt(height / chart_data.length) - barmargin;
+
+			var x_scale = d3.scaleLinear()
+							.domain([0,d3.max(chart_data,function(d){return d.value;})*1.05])
+							.range([0,width]);
+
+			var chart = svg.selectAll("g")
+				.data(chart_data)
+				.enter()
+				.append("g")
+				.attr("transform", function(d,i){
+					return "translate(0,"+i*(barheight+barmargin)+")";
+				});
+			chart.append("rect")
+				.attr("height", barheight)
+				.attr("width",function(d){ return x_scale(d.value);});
+
+			chart.append("text")
+			 	.attr("x", function(d) { return x_scale(d.value) - 10; })
+			 	.attr("y", barheight/2)
+			 	.attr("dy", ".30em")
+				.attr('class','charttitle')
+				.text(function(d){ return d.key; });
+
+			// X-axis
+			svg.append('g')
+			  .attr('transform', 'translate(0,'+height+')')
+			  .attr('class','chartaxis')
+			  .call(d3.axisBottom(x_scale));
+		}
     </script>    
 
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script type="text/javascript">
-  var data = {
-    top_menu : [
-      { menu : 'Main', link : '#'  },
-      { menu : 'About', link : '#'  }
-    ],
-    left_menu : [
-      { menu : 'Main', link : '#'  },
-      { menu : 'Jobs', link : '#'  },
-      { menu : 'ROI', link : '#'  }
-    ]
-  }
-  
-  var vm_menu = new Vue({
-      el: '#appLeftMenu',
-      data : {
-        menus:[
-          { menu : 'Dashboard', link : '#', _class:'nav-link active',
-            icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
-            
-          },
-          { menu : 'Jobs', link : '#', _class:'nav-link',
-            icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'
-          },{ menu : 'ROI', link : '#', _class:'nav-link',
-          	icon : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg>'
-          }
-        ]
-      },
-      created:function(){
-        console.log('left menu created!')
-      }
-  })
-
-  var vm_data = new Vue({
-      el: '#appMainTable',
-      data : {
-      	jobs: jobs_info,
-      	heads:["jobs","start","end","state","roi","result"]
-      },
-      created:function(){
-      	console.log('data created!')
-      }
-  })
-  </script>
+	<script type="text/javascript">
+	</script>
   </body>
 </html>

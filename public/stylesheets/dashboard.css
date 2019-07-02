@@ -103,17 +103,17 @@ body {
 }
 
 .chart rect {
-  fill: steelblue;
+  fill: darkblue;
 }
 
-.chart text{
-  fill: darkorange;
+.chart .charttitle{
+  fill: white;
   font: 15px sans-serif;
   text-anchor: end;
 }
 
-.chart g axis {
+.chart text {
   fill: black;
-  font: 15px sans-serif;
+  font: 10px sans-serif;
   text-anchor: end;
 }
