@@ -178,12 +178,17 @@ Main top Chart -->
     		let api_url = "/uipath/info/Jobs";
     		let from = vm_datepicker.from_date;
     		let to = vm_datepicker.to_date;
+    		let query = "?";
     		if(from != null && from.length >= 10){
     			api_url = api_url + "/" + from.substring(0,10);
+    			query = query + "from=" + from.substring(0,10)+"&";
     		}
     		if(to != null && to.length >= 10){
     			api_url = api_url + "/" + to.substring(0,10);
+    			query = query + "to=" + to.substring(0,10)+"&";
     		}
+    		console.log(query);
+    		api_url = "/uipath/api"+query;
     		console.log(api_url)
 	    	d3.json(api_url,function(data){
 	    		//console.log(data);

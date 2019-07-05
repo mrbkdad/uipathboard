@@ -10,6 +10,9 @@ var usersRouter = require('./routes/users');
 //UiPath API Router
 var uipathInfo = require('./routes/uipath/info');
 
+//Test
+var uipathapi = require('./routes/uipath/uipath_api');
+
 var app = express();
 
 // view engine setup
@@ -25,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/uipath/info',uipathInfo);
+app.use('/uipath/api',uipathapi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
